@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "176866917697",
+    "project_id": "t3-movil",
+    "storage_bucket": "t3-movil.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176866917697:android:6aa300618e8c41b9a175c0",
+        "android_client_info": {
+          "package_name": "com.example.taller3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWc5Axc8Xl-5LHjXMXlA4NVgCaIorsf4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
