@@ -22,11 +22,14 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.util.logging.Handler
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var map: MapView
     private lateinit var controller: IMapController
+    private lateinit var marker: Marker
+
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var btnMenu: ImageButton
     private lateinit var auth: FirebaseAuth
@@ -53,6 +56,8 @@ class HomeActivity : AppCompatActivity() {
 
         btnMenu = findViewById(R.id.btnMenu)
         setupPopupMenu()
+
+        startLocationUpdates()
     }
 
     private fun setupPopupMenu() {
@@ -157,18 +162,47 @@ class HomeActivity : AppCompatActivity() {
         locationOverlay.runOnFirstFix {
             val location = locationOverlay.myLocation
             if (location != null) {
-                val geoPoint = GeoPoint(location.latitude, location.longitude)
+                val latitud = location.latitude
+                val longitud = location.longitude
+
+                // Actualizar la latitud y longitud en Firebase para el usuario logueado
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                userId?.let { id ->
+                    val userRef = FirebaseDatabase.getInstance().getReference("usuarios").child(id)
+                    userRef.child("latitud").setValue(latitud)
+                    userRef.child("longitud").setValue(longitud)
+                }
+
+                // Mover el mapa y colocar el marcador con la nueva ubicación
+                val geoPoint = GeoPoint(latitud, longitud)
                 runOnUiThread {
                     controller.setCenter(geoPoint)
-                    val marker = Marker(map)
-                    marker.position = geoPoint
-                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    marker.title = "Tu ubicación actual"
-                    map.overlays.add(marker)
-                    map.invalidate()
+                    colocarMarcador(geoPoint)
                 }
             }
         }
+    }
+
+    private fun colocarMarcador(geoPoint: GeoPoint) {
+        if (::marker.isInitialized) {
+            map.overlays.remove(marker) // Elimina el marcador anterior
+        }
+        marker = Marker(map)
+        marker.position = geoPoint
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.title = "Mi ubicación"
+        map.overlays.add(marker)
+    }
+
+    private val handler = android.os.Handler()
+
+    private fun startLocationUpdates() {
+        handler.postDelayed(object : Runnable {
+            override fun run() {
+                mostrarUbicacionActual()  // Actualiza la ubicación
+                handler.postDelayed(this, 10000) // Repetir cada 10 segundos
+            }
+        }, 10000)
     }
 
     private fun agregarPuntosDeInteres() {

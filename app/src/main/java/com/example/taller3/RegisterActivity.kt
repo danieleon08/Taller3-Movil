@@ -75,6 +75,7 @@ class RegisterActivity : AppCompatActivity() {
                                 "nombre" to nombre,
                                 "apellido" to apellido,
                                 "email" to email,
+                                "contraseña" to password,
                                 "identificacion" to identificacion,
                                 "latitud" to 0.0, // Por ahora, luego pedimos permiso
                                 "longitud" to 0.0
