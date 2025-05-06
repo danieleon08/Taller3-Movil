@@ -8,4 +8,8 @@
         android:id="@+id/action_logout"
         android:title="Cerrar sesión"
         android:icon="@drawable/ic_logout" />
+    <item
+        android:id="@+id/action_disponibles"
+        android:title="Ver Disponibles"
+        android:icon="@drawable/ic_disponibles" />
 </menu>

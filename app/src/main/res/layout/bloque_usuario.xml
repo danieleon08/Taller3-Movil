@@ -1,0 +1,37 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#B3ADA7"
+    android:padding="16dp">
+
+    <!-- Nombre del usuario -->
+    <TextView
+        android:id="@+id/us_nombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Daniel Leon"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Botón para ver la ubicación -->
+    <Button
+        android:id="@+id/btn_ubicacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/us_nombre"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#FFA500"
+        android:text="Ver ubicación"
+        android:textColor="#FFFFFF" />
+
+    <!-- Foto de perfil -->
+    <ImageView
+        android:id="@+id/us_foto"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="14dp"
+        android:layout_toEndOf="@id/btn_ubicacion"
+        android:src="@drawable/ic_disponibles" />
+</RelativeLayout>

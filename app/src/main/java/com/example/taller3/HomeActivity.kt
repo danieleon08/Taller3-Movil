@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.taller3.databinding.ActivityHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -26,6 +27,8 @@ import java.util.logging.Handler
 
 class HomeActivity : AppCompatActivity() {
 
+    lateinit var binding: ActivityHomeBinding
+
     private lateinit var map: MapView
     private lateinit var controller: IMapController
     private lateinit var marker: Marker
@@ -37,6 +40,9 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(binding.root) //La asociacion de Front con Back
 
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osmdroid", MODE_PRIVATE))
         setContentView(R.layout.activity_home)
@@ -70,7 +76,7 @@ class HomeActivity : AppCompatActivity() {
         val popupMenu = PopupMenu(this, view)
         popupMenu.menuInflater.inflate(R.menu.menu_opciones, popupMenu.menu)
 
-        // Forzar íconos visibles
+        // Forzar que se vean los íconos en el popup
         try {
             val fields = popupMenu.javaClass.declaredFields
             for (field in fields) {
@@ -97,11 +103,17 @@ class HomeActivity : AppCompatActivity() {
                     toggleUserStatus()
                     true
                 }
+                R.id.action_disponibles -> {  // Nueva opción para DisponiblesActivity
+                    val intent = Intent(this, Disponibles::class.java)
+                    startActivity(intent)
+                    true
+                }
                 else -> false
             }
         }
         popupMenu.show()
     }
+
 
     private fun logoutUser() {
         auth.signOut()
