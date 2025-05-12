@@ -28,10 +28,11 @@
     <!-- Foto de perfil -->
     <ImageView
         android:id="@+id/us_foto"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="14dp"
-        android:layout_toEndOf="@id/btn_ubicacion"
+        android:layout_below="@id/us_nombre"
         android:src="@drawable/ic_disponibles" />
 </RelativeLayout>

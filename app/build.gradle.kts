@@ -59,4 +59,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation (libs.osmbonuspack)
     implementation (libs.play.services.location)
+
 }

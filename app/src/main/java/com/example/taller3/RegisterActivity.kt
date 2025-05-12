@@ -1,15 +1,22 @@
 package com.example.taller3
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import java.io.File
+import java.io.FileOutputStream
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -19,12 +26,17 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var etEmail: EditText
     private lateinit var etPassword: EditText
     private lateinit var btnCrearCuenta: Button
+    private lateinit var btnTomarFoto: Button
+    private lateinit var imagePerfil: ImageView
+
+    private var imageUri: Uri? = null
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var database: DatabaseReference
 
     companion object {
         private const val TAG = "RegisterActivity"
+        private const val REQUEST_IMAGE_CAPTURE = 1
+        private const val REQUEST_CAMERA_PERMISSION = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +44,6 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance().reference
 
         etNombre = findViewById(R.id.etNombre)
         etApellido = findViewById(R.id.etApellido)
@@ -40,6 +51,21 @@ class RegisterActivity : AppCompatActivity() {
         etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         btnCrearCuenta = findViewById(R.id.btnCrearCuenta)
+        btnTomarFoto = findViewById(R.id.btnTomarFoto)
+        imagePerfil = findViewById(R.id.imagePerfil)
+
+        btnTomarFoto.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    REQUEST_CAMERA_PERMISSION
+                )
+            } else {
+                openCamera()
+            }
+        }
 
         btnCrearCuenta.setOnClickListener {
             val nombre = etNombre.text.toString()
@@ -77,15 +103,39 @@ class RegisterActivity : AppCompatActivity() {
                                 "email" to email,
                                 "contraseña" to password,
                                 "identificacion" to identificacion,
-                                "latitud" to 0.0, // Por ahora, luego pedimos permiso
+                                "latitud" to 0.0,
                                 "longitud" to 0.0
                             )
 
-                            database.child("usuarios").child(userId).setValue(userMap)
+                            FirebaseDatabase.getInstance().reference
+                                .child("usuarios").child(userId).setValue(userMap)
                                 .addOnSuccessListener {
-                                    Toast.makeText(this, "Cuenta creada exitosamente.", Toast.LENGTH_SHORT).show()
-                                    startActivity(Intent(this, HomeActivity::class.java))
-                                    finish()
+                                    if (imageUri != null) {
+                                        val storageRef = FirebaseStorage.getInstance().reference
+                                            .child("imagenes_perfil/$userId.jpg")
+
+                                        storageRef.putFile(imageUri!!)
+                                            .addOnSuccessListener {
+                                                Toast.makeText(
+                                                    this,
+                                                    "Cuenta e imagen creadas exitosamente.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                                startActivity(Intent(this, HomeActivity::class.java))
+                                                finish()
+                                            }
+                                            .addOnFailureListener {
+                                                Toast.makeText(
+                                                    this,
+                                                    "Usuario creado, pero error al subir imagen.",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                    } else {
+                                        Toast.makeText(this, "Cuenta creada sin imagen.", Toast.LENGTH_SHORT).show()
+                                        startActivity(Intent(this, HomeActivity::class.java))
+                                        finish()
+                                    }
                                 }
                                 .addOnFailureListener {
                                     Toast.makeText(this, "Error al guardar datos.", Toast.LENGTH_SHORT).show()
@@ -96,6 +146,40 @@ class RegisterActivity : AppCompatActivity() {
                         Toast.makeText(this, "Error al crear cuenta: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
+        }
+    }
+
+    private fun openCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera()
+            } else {
+                Toast.makeText(this, "Permiso de cámara denegado.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            val bitmap = data?.extras?.get("data") as? Bitmap
+            bitmap?.let {
+                imagePerfil.setImageBitmap(it)
+                val file = File.createTempFile("profile_", ".jpg", cacheDir)
+                val out = FileOutputStream(file)
+                it.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                out.flush()
+                out.close()
+                imageUri = Uri.fromFile(file)
+            }
         }
     }
 
