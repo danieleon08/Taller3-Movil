@@ -6,4 +6,5 @@
     android:padding="16dp"
     android:id="@+id/listado_disponibles">
 
+
 </LinearLayout>

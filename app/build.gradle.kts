@@ -54,9 +54,9 @@ dependencies {
     implementation(libs.firebase.bom)
     implementation(libs.firebaseui.firebase.ui.auth)
     //implementation(libs.mkergall.osmbonuspack)
-    //implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
+    implementation (libs.osmbonuspack)
+    implementation (libs.play.services.location)
 }

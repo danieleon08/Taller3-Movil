@@ -75,14 +75,22 @@ class Disponibles : AppCompatActivity() {
         cargarImagenUsuario(usuarioId, fotoPerfilImageView)
 
         // Configurar el botón "Ver ubicación"
-        // val btnVerUbicacion = bloqueUsuarioView.findViewById<Button>(R.id.btn_ubicacion)
-        // btnVerUbicacion.setOnClickListener {
-            // Redirigir a la actividad de ubicación (si lo necesitas)
-           // val intent = Intent(this, MapaUbicacionActivity::class.java)
-           // intent.putExtra("latitud", latitud)
-           // intent.putExtra("longitud", longitud)
-           // startActivity(intent)
-        //}
+        val btnVerUbicacion = bloqueUsuarioView.findViewById<Button>(R.id.btn_ubicacion)
+        btnVerUbicacion.setOnClickListener {
+            val intent = Intent(this, PosicionActual::class.java)
+
+            val bundle = Bundle().apply {
+                putString("nombre", nombre)
+                putString("apellido", apellido)
+                putString("usuarioId", usuarioId)
+                putDouble("latitud", latitud)
+                putDouble("longitud", longitud)
+            }
+
+            intent.putExtras(bundle)
+            startActivity(intent)
+        }
+
 
         // Agregar el bloque a un contenedor en la actividad
         val listadoDisponibles = findViewById<LinearLayout>(R.id.listado_disponibles)  // Asegúrate de tener un LinearLayout en tu layout
