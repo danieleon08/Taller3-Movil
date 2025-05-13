@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -73,13 +74,19 @@ class UsuarioDisponibleService : Service() {
         latitud: Double,
         longitud: Double
     ) {
+        // Crear el Bundle
+        val bundle = Bundle().apply {
+            putString("nombre", nombre)
+            putString("apellido", apellido)
+            putString("usuarioId", usuarioId)
+            putDouble("latitud", latitud)
+            putDouble("longitud", longitud)
+        }
+
+        // Crear el Intent y añadir el Bundle
         val intent = Intent(this, PosicionActual::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("nombre", nombre)
-            putExtra("apellido", apellido)
-            putExtra("usuarioId", usuarioId)
-            putExtra("latitud", latitud)
-            putExtra("longitud", longitud)
+            putExtras(bundle) // Agregar el Bundle al Intent
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -101,6 +108,7 @@ class UsuarioDisponibleService : Service() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.notify((0..10000).random(), notification)
     }
+
 
     override fun onBind(intent: Intent?): IBinder? = null
 

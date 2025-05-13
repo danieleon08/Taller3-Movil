@@ -221,7 +221,6 @@ class HomeActivity : AppCompatActivity() {
                 val geoPoint = GeoPoint(latitud, longitud)
                 runOnUiThread {
                     controller.setCenter(geoPoint)
-                    colocarMarcador(geoPoint)
                 }
             }
         }
